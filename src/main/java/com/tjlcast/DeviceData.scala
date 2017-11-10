@@ -1,7 +1,8 @@
 package com.tjlcast ;
 
 
-import java.util.Properties
+import java.text.SimpleDateFormat
+import java.util.{Date, Properties}
 import java.util.concurrent.Future
 
 import org.apache.kafka.clients.producer.{KafkaProducer, ProducerRecord, RecordMetadata}
@@ -86,7 +87,9 @@ object DeviceData {
         uid_mid_count.foreachRDD(rdd => {
             if (!rdd.isEmpty) {
                 rdd.foreach(record => {
-                    kafkaProducer.value.send("AnalysisData", record.toString())
+                    val timestamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date().getTime)
+                    val msg = (record._1, record._2, record._3, record._4, timestamp)
+                    kafkaProducer.value.send("AnalysisData", msg.toString())
                 })
             }
         })

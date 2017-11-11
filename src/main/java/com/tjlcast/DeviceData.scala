@@ -68,7 +68,7 @@ object DeviceData {
             val avg = e._4
             val variance = midData / count
             (uid, (variance, avg, count))
-        }).reduceByKey((a, b) => b) // (uid, var, avg, count) uid unique
+        }).reduceByKey((a, b) => b)// (uid, var, avg, count) uid unique
 
         // 广播KafkaSink
         val kafkaProducer: Broadcast[KafkaSink[String, String]] = {
@@ -88,7 +88,7 @@ object DeviceData {
             if (!rdd.isEmpty) {
                 rdd.foreach(record => {
                     val timestamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date().getTime)
-                    val msg = (record._1, record._2, record._3, record._4, timestamp)
+                    val msg = (record._1, record._2._1, record._2._2, record._2._3, timestamp)
                     kafkaProducer.value.send("AnalysisData", msg.toString())
                 })
             }

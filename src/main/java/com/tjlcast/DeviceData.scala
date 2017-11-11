@@ -137,7 +137,7 @@ class KafkaDataSource extends Serializable {
 class KafkaSink[K, V](createProducer: () => KafkaProducer[K, V]) extends Serializable {
     /* This is the key idea that allows us to work around running into
        NotSerializableExceptions. */
-    lazy val producer = createProducer()
+    lazy val producer = createProducer() // 惰性变量只能是不可变变量，并且只有在调用惰性变量时，才会去实例化这个变量。
     def send(topic: String, key: K, value: V): Future[RecordMetadata] =
         producer.send(new ProducerRecord[K, V](topic, key, value))
     def send(topic: String, value: V): Future[RecordMetadata] =

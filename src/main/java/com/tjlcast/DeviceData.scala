@@ -61,7 +61,7 @@ object DeviceData {
             (uid, midData, count, avg)
         }).reduce((a, b)=> (a._1, a._2+b._2, a._3, a._4))// (uid, midData(total), count， avg)
 
-        uid_mid_count.map( e => {
+        val result = uid_mid_count.map( e => {
             val uid = e._1
             val midData = e._2
             val count = e._3
@@ -83,8 +83,8 @@ object DeviceData {
         }
 
         // todo send to kafka
-        uid_mid_count.print()
-        uid_mid_count.foreachRDD(rdd => {
+        result.print()
+        result.foreachRDD(rdd => {
             if (!rdd.isEmpty) {
                 rdd.foreach(record => {
                     val timestamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date().getTime)

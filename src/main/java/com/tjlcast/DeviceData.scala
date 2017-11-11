@@ -42,7 +42,7 @@ object DeviceData {
             val jsonS = JSON.parseFull(str)
             val first = regJson(jsonS)
             (first.get("uid").get.toString, parseDouble(first.get("data").get.toString).get)
-        })
+        })// (uid, data)
 
         // compute avg
         val uid_total_rdd = itemRdd.reduceByKey(_ + _)
@@ -58,17 +58,17 @@ object DeviceData {
             val data = e._2._1
             val avg = e._2._2._1
             val midData = (data - avg) * (data - avg)
-            (uid, midData, count, avg)
-        }).reduce((a, b)=> (a._1, a._2+b._2, a._3, a._4))// (uid, midData(total), count， avg)
+            (uid, (midData, count, avg))
+        }).reduceByKey((a, b)=> (a._1+b._1, a._2, a._3))// (uid, (midData(total), count， avg))
 
         val result = uid_mid_count.map( e => {
             val uid = e._1
-            val midData = e._2
-            val count = e._3
-            val avg = e._4
+            val midData = e._2._1
+            val count = e._2._2
+            val avg = e._2._3
             val variance = midData / count
             (uid, (variance, avg, count))
-        }).reduceByKey((a, b) => b)// (uid, var, avg, count) uid unique
+        })// (uid, (var, avg, count)) uid unique
 
         // 广播KafkaSink
         val kafkaProducer: Broadcast[KafkaSink[String, String]] = {

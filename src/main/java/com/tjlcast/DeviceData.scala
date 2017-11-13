@@ -21,7 +21,7 @@ object DeviceData {
         System.out.println("hello world")
 
         val conf = new SparkConf().setMaster("local[2]").setAppName("NetworkWordCount")
-        val ssc = new StreamingContext(conf, Seconds(2))
+        val ssc = new StreamingContext(conf, Seconds(20))
 
         // receive data from kafka
         val source = new KafkaDataSource().getDstream(ssc)
@@ -30,7 +30,7 @@ object DeviceData {
         // receive data from socket
         // val lines = new SocketDataSource().getDstream(ssc)
 
-        val windows = lines.window(Seconds(10), Seconds(10))
+        val windows = lines.window(Seconds(20), Seconds(20))
         //// {"uid":"922291","data":10,"current_time":"2017-11-06 17:44:45"}
 
         def regJson(json:Option[Any]) = json match {
@@ -88,7 +88,7 @@ object DeviceData {
             if (!rdd.isEmpty) {
                 rdd.foreach(record => {
                     val timestamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date().getTime)
-                    val msg = (record._1, record._2._1, record._2._2, record._2._3, timestamp)
+                    val msg = (record._1, record._2._1, record._2._3, record._2._2, timestamp)
                     kafkaProducer.value.send("AnalysisData", msg.toString())
                 })
             }

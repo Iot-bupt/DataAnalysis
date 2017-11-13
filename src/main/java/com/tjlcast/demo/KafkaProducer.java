@@ -11,6 +11,8 @@ import java.util.Random;
 
 /**
  * Created by tangjialiang on 2017/11/13.
+ * git: mine and bupt
+ *
  */
 public class KafkaProducer {
 
